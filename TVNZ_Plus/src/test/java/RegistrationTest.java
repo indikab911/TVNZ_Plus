@@ -102,7 +102,8 @@ public class RegistrationTest {
     }
 
     @Test
-    //Homework print items in movies belt
+    //Homework
+    //print items in movies belt
     public void getMoviesBeltItems() {
 
       //  driver.findElement(By.xpath("//h2[@data-anchor='Movies']/../../..//div[@class='swiper-button-next swiper-no-swiping']")).click();
