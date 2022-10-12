@@ -1,13 +1,18 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +51,7 @@ public class RegistrationTest {
     WebDriver driver = null;
     static String email = null;
     static String password = null;
+
 
     @Test
     public void registrationWithCodeInTestMethod() {
@@ -106,7 +112,16 @@ public class RegistrationTest {
     //print items in movies belt
     public void getMoviesBeltItems() {
 
-      //  driver.findElement(By.xpath("//h2[@data-anchor='Movies']/../../..//div[@class='swiper-button-next swiper-no-swiping']")).click();
+        Actions builder = new Actions(driver);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60),Duration.ofSeconds(5));
+        builder.moveToElement(driver.findElement(By.xpath("//h2[@id='anchor-Movies']/../../..//div[@class='swiper-wrapper']//a/div"))).build().perform();
+
+        WebElement element = driver.findElement(By.xpath("//h2[@data-anchor='Movies']/../../..//span[@aria-label='Next slide']/div[@class='swiper-button-next swiper-no-swiping']"));
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+        while (element.isDisplayed()){
+            element.click();
+            //      Thread.sleep(1000);
+        }
 
         List<WebElement> moviesBelt = driver.findElements(By.xpath("//h2[@data-anchor='Movies']/../../..//div[@class='swiper-wrapper']//a/div"));
         int count = 0;
@@ -115,5 +130,66 @@ public class RegistrationTest {
             count ++;
         }
         System.out.println(count);
+    }
+
+
+    @Test
+    //Exercise
+    //Hover over on a belt item and get the description
+    public void getMoviesBeltItemDescription() {
+
+        Actions builder = new Actions(driver);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60),Duration.ofSeconds(5));
+        builder.moveToElement(driver.findElement(By.xpath("//div[@id='Entrapment']"))).build().perform();
+
+        List<WebElement> moviesBelt = driver.findElements(By.xpath("//div[@id='Entrapment']//div[@class='QuickInfo-overview']/child::*"));
+              for (WebElement e : moviesBelt) {
+            System.out.println(e.getAttribute("QuickInfo-synopsis"));
+                   }
+
+    }
+
+    @Test
+    public void viewMoreClick() throws InterruptedException {
+        Actions builder = new Actions(driver);
+        List<WebElement> moviesBelt = driver.findElements(By.xpath("//h2[@id='anchor-Movies']/../../..//div[@class='swiper-wrapper']//a/div"));
+        Thread.sleep(3000);
+        builder.moveToElement(moviesBelt.get(0)).perform();
+
+        Thread.sleep(3000);
+
+    }
+
+    @Test
+    //Getting the synopsis
+    public void gettingSynopsis() throws InterruptedException {
+        Actions builder = new Actions(driver);
+        List<WebElement> movies = driver.findElements(By.xpath("//h2[@id='anchor-Movies']/../../..//div[@class='swiper-wrapper']//a/div"));
+        Thread.sleep(3000);
+        builder.moveToElement(movies.get(2)).perform();
+        Thread.sleep(3000);
+        System.out.println(movies.get(2).getAttribute("innerHTML"));
+        System.out.println(movies.get(2).findElement(By.cssSelector("div.QuickInfo-synopsis")).getText());
+        Thread.sleep(3000);
+
+    }
+
+
+
+    @Test
+    //Homework 7/10/22
+    //Getting screenshot of categories list drop down
+
+    public void screenShotCategoryList() throws InterruptedException, IOException {
+        Actions builder = new Actions(driver);
+        List<WebElement> categories = driver.findElements(By.xpath("//a[@title='Categories']"));
+        Thread.sleep(3000);
+        builder.moveToElement(categories.get(0)).perform();
+        Thread.sleep(3000);
+        TakesScreenshot screenshot = (TakesScreenshot) driver;
+        File screenShotFile = screenshot.getScreenshotAs(OutputType.FILE);
+        File destination = new File("/Users/ibandra/Automation/TVNZ_Plus/target/categoryList.png");
+        FileUtils.copyFile(screenShotFile, destination);
+
     }
 }
